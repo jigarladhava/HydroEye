@@ -9,6 +9,12 @@ const https = require('https');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 fs = require('fs');
+
+
+const passport = require('passport');/* New code for login Module*/
+require('./config/passport')(passport); /* New code for login Module*/
+
+
 const axiosinstance = axios.create({
   httpsAgent: new https.Agent({
     rejectUnauthorized: false
@@ -40,6 +46,15 @@ const ph1swmsdataService = new ph1swmsDataService();
 app.use(bodyParser.json());
 app.use(basicAuth('user', 'blank'));
 app.use(express.static(path.join(__dirname, 'public')));
+
+/* New code for login Module*/
+const ensureAuthenticated = (req, res, next) => {
+  if (req.isAuthenticated()) return next();
+  res.redirect('/login');
+};
+/* New code for login Module*/
+
+
 
 app.get('/data', async (req, res) => {
   const { dlp, flowmeter, startTime, endTime } = req.query;
@@ -572,6 +587,46 @@ app.post('/bulkRTU/remove', async (req, res) => {
     }
   });
 });
+
+
+app.get('/login', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+});
+
+app.post(
+  '/login',
+  passport.authenticate('local', {
+    successRedirect: '/dashboard',
+    failureRedirect: '/login',
+  })
+);
+
+app.get('/signup', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'signup.html'));
+});
+
+app.post('/signup', async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ username, password: hashedPassword });
+    res.redirect('/login');
+  } catch (err) {
+    res.status(500).send('Error signing up.');
+  }
+});
+
+app.get('/dashboard', ensureAuthenticated, (req, res) => {
+  res.send(`Welcome, ${req.user.username}! <a href="/logout">Logout</a>`);
+});
+
+app.get('/logout', (req, res) => {
+  req.logout((err) => {
+    if (err) return next(err);
+    res.redirect('/login');
+  });
+});
+
 
 
 
