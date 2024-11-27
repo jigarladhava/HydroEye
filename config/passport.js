@@ -1,31 +1,34 @@
-const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 
-// Passport Local Strategy
-passport.use(
-  new LocalStrategy(async (username, password, done) => {
-    try {
-      const user = await User.findOne({ where: { username } });
-      if (!user) return done(null, false, { message: 'Incorrect username.' });
+module.exports = function (passport) {
+    passport.use(
+        new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
+            // Replace with your actual user fetching logic
+            const user = { id: 1, email: 'test@test.com', password: '$2b$10$...' }; // Example user
+            
+            if (!user) {
+                return done(null, false, { message: 'No user found' });
+            }
 
-      const isMatch = await bcrypt.compare(password, user.password);
-      if (!isMatch) return done(null, false, { message: 'Incorrect password.' });
+            bcrypt.compare(password, user.password, (err, isMatch) => {
+                if (err) throw err;
+                if (isMatch) {
+                    return done(null, user);
+                } else {
+                    return done(null, false, { message: 'Password incorrect' });
+                }
+            });
+        })
+    );
 
-      return done(null, user);
-    } catch (err) {
-      return done(err);
-    }
-  })
-);
+    passport.serializeUser((user, done) => {
+        done(null, user.id);
+    });
 
-// Serialize and Deserialize User
-passport.serializeUser((user, done) => done(null, user.id));
-passport.deserializeUser(async (id, done) => {
-  try {
-    const user = await User.findByPk(id);
-    done(null, user);
-  } catch (err) {
-    done(err);
-  }
-});
+    passport.deserializeUser((id, done) => {
+        // Replace with your actual user finding logic
+        const user = { id: 1, email: 'test@test.com' }; // Example user
+        done(null, user);
+    });
+};

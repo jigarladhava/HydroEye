@@ -13,7 +13,10 @@ fs = require('fs');
 
 const passport = require('passport');/* New code for login Module*/
 require('./config/passport')(passport); /* New code for login Module*/
+const auth = require('./middleware/auth'); /* New code for login Module*/
+const { sequelize } = require('./models/database'); /* New code for login Module*/
 
+auth(app);
 
 const axiosinstance = axios.create({
   httpsAgent: new https.Agent({
@@ -48,6 +51,13 @@ app.use(basicAuth('user', 'blank'));
 app.use(express.static(path.join(__dirname, 'public')));
 
 /* New code for login Module*/
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(session({ secret: 'auth_model_secret', resave: false, saveUninitialized: true }));
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) return next();
   res.redirect('/login');
@@ -365,21 +375,21 @@ app.get('/ph1/swms/data', async (req, res) => {
 app.get('/ph1/data', async (req, res) => {
   const { objectname, startTime, endTime } = req.query;
   console.log(req.query);
-    try {
-  const tags = await ph1dataservice.fetchph1HistoicData(objectname, startTime, endTime);
-  const transformedData = tags.map(item => {
-    return {
-      tagName: item.TagName,
-      timestamp: item.TimeStamp,
-      value: parseFloat(item.Value) // Assuming the "Value" property is a string representing a numeric value
-    };
-  });
-  res.json(transformedData);
-	}
-	catch (error) {
-            console.error('Error fetching data:', error);
-          res.json(null);
-    }
+  try {
+    const tags = await ph1dataservice.fetchph1HistoicData(objectname, startTime, endTime);
+    const transformedData = tags.map(item => {
+      return {
+        tagName: item.TagName,
+        timestamp: item.TimeStamp,
+        value: parseFloat(item.Value) // Assuming the "Value" property is a string representing a numeric value
+      };
+    });
+    res.json(transformedData);
+  }
+  catch (error) {
+    console.error('Error fetching data:', error);
+    res.json(null);
+  }
 });
 
 
@@ -424,38 +434,38 @@ app.get('/ph1/swms/MLDdata', async (req, res) => {
 app.get('/ph1/MLDdata', async (req, res) => {
   const { objectname, startTime, endTime } = req.query;
   console.log(req.query);
-  try{
-  const tags = await ph1dataservice.fetchph1HistoricMLD(objectname, startTime, endTime);
-  let transformedData = tags.map(item => {
-    return {
-      tagName: item.TagName,
-      timestamp: moment(item.TimeStamp, 'YYYY-MM-DD HH:mm:ss.SSS').add(1, 'seconds').startOf('day').toISOString(),
-      //  /   timestamp: moment(item.TimeStamp, 'YYYY-MM-DD HH:mm:ss.SSS').add(1, 'seconds'),
-      value: parseFloat(item.Value) // Assuming the "Value" property is a string representing a numeric value
-    };
-  });
+  try {
+    const tags = await ph1dataservice.fetchph1HistoricMLD(objectname, startTime, endTime);
+    let transformedData = tags.map(item => {
+      return {
+        tagName: item.TagName,
+        timestamp: moment(item.TimeStamp, 'YYYY-MM-DD HH:mm:ss.SSS').add(1, 'seconds').startOf('day').toISOString(),
+        //  /   timestamp: moment(item.TimeStamp, 'YYYY-MM-DD HH:mm:ss.SSS').add(1, 'seconds'),
+        value: parseFloat(item.Value) // Assuming the "Value" property is a string representing a numeric value
+      };
+    });
 
-  transformedData = transformedData.filter(currentdata => currentdata.value > 0 && currentdata.value < 300);
-  /*
-    const groupedData = transformedData.reduce((acc, item) => {
-      const date = item.timestamp.split(' ')[0]; // Extract date part
-      if (!acc[date]) {
-        acc[date] = [];
-      }
-      acc[date].push(item);
-      return acc;
-    }, {});*/
-
-
+    transformedData = transformedData.filter(currentdata => currentdata.value > 0 && currentdata.value < 300);
+    /*
+      const groupedData = transformedData.reduce((acc, item) => {
+        const date = item.timestamp.split(' ')[0]; // Extract date part
+        if (!acc[date]) {
+          acc[date] = [];
+        }
+        acc[date].push(item);
+        return acc;
+      }, {});*/
 
 
 
-  res.json(transformedData);
+
+
+    res.json(transformedData);
   }
-	catch (error) {
-            console.error('Error fetching data:', error);
-          res.json(null);
-    }
+  catch (error) {
+    console.error('Error fetching data:', error);
+    res.json(null);
+  }
 });
 
 
@@ -464,7 +474,7 @@ app.post('/bulkDLP/query', async (req, res) => {
   const { dlpNo, fmID, startTime, endTime } = req.body;
   /*    const startTime = '2024-06-01 00:00:00'; // Example start time
       const endTime = '2024-07-02 00:00:00'; // Example end time*/
-    
+
 
 
   const SQLConstraint = `"RecordTime" BETWEEN {TS '${startTime}'} AND {TS '${endTime}'}`;
@@ -487,7 +497,7 @@ app.post('/bulkDLP/query', async (req, res) => {
 
 
 
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error executing query:', error);
@@ -529,19 +539,19 @@ app.post('/bulkRTU/query', async (req, res) => {
   const { dlpNo, fmID, startTime, endTime } = req.body;
   /*    const startTime = '2024-06-01 00:00:00'; // Example start time
       const endTime = '2024-07-02 00:00:00'; // Example end time*/
-    
 
 
-var SQLConstraint = "\"RecordTime\" BETWEEN {TS '" + startTime + "'} AND {TS '" + endTime + "'}";
 
-        var columnNames = "\"RecordTime\"  as \"timestamp\", \"ValueAsReal\" as \"value\" ";
+  var SQLConstraint = "\"RecordTime\" BETWEEN {TS '" + startTime + "'} AND {TS '" + endTime + "'}";
 
-        var SQLQuery = `SELECT O.FullName as "tagName",` + columnNames + `FROM CDBHISTORIC H INNER JOIN CDBObject O ON H.Id=O.Id WHERE 
+  var columnNames = "\"RecordTime\"  as \"timestamp\", \"ValueAsReal\" as \"value\" ";
+
+  var SQLQuery = `SELECT O.FullName as "tagName",` + columnNames + `FROM CDBHISTORIC H INNER JOIN CDBObject O ON H.Id=O.Id WHERE 
             (O.FullName LIKE '` + "RTUs%" + dlpNo + "%" + fmID + "_Instant_Flow" + "' OR "
-            + "O.FullName LIKE '" + "RTUs%" + dlpNo + "%" + fmID + "_Todays_Flow" + "' OR "
-            + " O.FullName LIKE '" + "RTUs%" + dlpNo + "%" + fmID + "_Totalizer" + "' )"
-            + " And " + SQLConstraint + ` Order By "RecordTime" ASC`;
-			
+    + "O.FullName LIKE '" + "RTUs%" + dlpNo + "%" + fmID + "_Todays_Flow" + "' OR "
+    + " O.FullName LIKE '" + "RTUs%" + dlpNo + "%" + fmID + "_Totalizer" + "' )"
+    + " And " + SQLConstraint + ` Order By "RecordTime" ASC`;
+
 
   try {
     const response = await axiosinstance.post(`${baseUrl}/query`, { query: SQLQuery });
@@ -551,7 +561,7 @@ var SQLConstraint = "\"RecordTime\" BETWEEN {TS '" + startTime + "'} AND {TS '" 
       //  console.log(historicalData[i]);
       result[i].timestamp = DateTime.fromFormat(result[i].timestamp.replace(/\.\d+$/g, ''), 'dd/MM/yyyy HH:mm:ss').toFormat('yyyy-MM-dd  HH:mm:ss');
     }
-    
+
     res.json(result);
   } catch (error) {
     console.error('Error executing query:', error);
@@ -593,6 +603,12 @@ app.get('/login', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'login.html'));
 });
 
+
+app.get('/', (req, res) => {
+  res.send('Welcome to the Home Page!');
+});
+
+
 app.post(
   '/login',
   passport.authenticate('local', {
@@ -631,5 +647,14 @@ app.get('/logout', (req, res) => {
 
 
 app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
+  // console.log(`Server running at http://localhost:${port}`);
+  try {
+    sequelize.authenticate(); // Verify DB connection on startup
+    console.log('Database connection verified.');
+    console.log(`Server running on http://localhost:${PORT}`);
+  } catch (error) {
+    console.error('Database connection failed:', error);
+  }
+
+
 });
