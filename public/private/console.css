@@ -1,0 +1,59 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.content {
+    padding: 20px;
+}
+
+.console {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    background-color: #333;
+    color: white;
+    border-top: 2px solid #444;
+    overflow-y: auto;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    display: none;
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    background-color: #444;
+    border-bottom: 1px solid #555;
+}
+
+.console-body {
+    padding: 10px;
+}
+
+.console-body p {
+    margin: 0;
+    padding: 5px;
+    border-bottom: 1px solid #555;
+}
+
+button {
+    background-color: #444;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+
+button:hover {
+    background-color: #555;
+}
+
+.container {
+    padding-bottom: 220px; /* Adjust this value to be greater than the console's max-height */
+}

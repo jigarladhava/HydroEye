@@ -1,0 +1,22 @@
+http://117.206.154.178:8000/System/FlowTransmitter
+{
+  objectname: 'MAF_PT68',
+  startTime: '2024-03-01 06:43:14',
+  endTime: '2024-04-09 17:43:14'
+}
+2024-03-01 06:43:14
+2024-04-09 17:43:14
+http://117.206.154.178:8000/System/PressureTransmitter
+Error fetching data: AxiosError: Request failed with status code 500
+    at settle (E:\Jigar\DLPDataCheck\node_modules\axios\dist\node\axios.cjs:1966:12)
+    at IncomingMessage.handleStreamEnd (E:\Jigar\DLPDataCheck\node_modules\axios\dist\node\axios.cjs:3065:11)
+    at IncomingMessage.emit (node:events:529:35)
+    at endReadableNT (node:internal/streams/readable:1400:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+    at Axios.request (E:\Jigar\DLPDataCheck\node_modules\axios\dist\node\axios.cjs:3876:41)
+    at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+    at async ph1DataService.fetchph1HistoicData (E:\Jigar\DLPDataCheck\ph1dataService.js:80:30)
+    at async E:\Jigar\DLPDataCheck\server.js:185:16 {
+  code: 'ERR_BAD_RESPONSE',
+  config: {
+    transitional: {

@@ -1,0 +1,99 @@
+6297-FM	OK	
+6296-FM	Not OK	+-3495 fluctuations
+6296-FM2	Not OK	Sinewave pattern +-75
+6298-FM	OK	
+4903-FM	Not OK	Continues 36 flow
+4903-FM2	OK	
+4908-FM	OK	
+4908-FM2	OK	
+4908-FM3	OK	
+6293-FM	OK	
+6293-FM2	OK	
+4933-FM	Not OK	Lifetime zero flow
+4933-FM2	Not OK	Lifetime zero flow-
+4933-FM3	OK	
+4906-FM	OK	
+4906-FM2	Not OK	Abnormal flow pattern, check if air issue ?
+4906-FM3	OK	
+4906-FM4	Not Ok	No data Availiable for 2024-06-15 17:05:41:2024-07-08 17:05:41
+6292-FM	OK	
+6292-FM2	OK	
+6292-FM3	OK	
+4907-FM	OK	
+6430-FM	OK	
+6424-FM	OK	
+6424-FM2	OK	
+4935-FM	OK	
+4935-FM2	OK	
+4915-FM	OK	
+4915-FM2	OK	
+4915-FM3	Not OK	Invalid -763 flow
+4927-FM	OK	
+6422-FM	OK	
+4936-FM	OK	
+4936-FM2	Not OK	Abnormal flow pattern
+6290-FM	OK	
+6290-FM2	Not OK	Lifetime flow and flow zero
+4934-FM	OK	
+4934-FM2	OK	
+4934-FM3	OK	
+4934-FM4	OK	
+4934-FM5	Not Ok	No data Availiable for 2024-06-15 17:05:41:2024-07-08 17:05:41
+6302-FM	OK	
+6305-FM	OK	
+6305-FM2	OK	
+4909-FM	OK	
+4910-FM	OK	
+4910-FM2	OK	
+4910-FM3	OK	
+4910-FM4	OK	
+6294-FM	OK	
+6294-FM2	Not OK	Abnormal Flow
+6429-FM	Not OK	Too much fluctuations in zone time check for air.
+4914-FM	Not OK	zero readings
+4913-FM	OK	
+4913-FM2	OK	
+4912-FM	OK	
+4911-FM	OK	
+4911-FM2	OK	
+4911-FM3	Not OK	Zero flow
+6428-FM	OK	
+6428-FM2	Not OK	Invalid fluctuations
+6425-FM	OK	
+6425-FM2	OK	
+6425-FM3	Not OK	Zero Flow
+4922-FM	Not OK	After 24 June there is some issue. Day's total fluctuates
+4922-FM2	OK	
+4922-FM3	Not OK	After 28 June constant 36 flow , check
+4922-FM4	Not OK	Zero flow
+4922-FM5	Not OK	Zero flow
+4920-FM	OK	
+4920-FM2	OK	
+6285-FM	Not OK	Too much spikes, air or ? Not working proper.
+6283-FM	OK	
+4905-FM	OK	
+6301-FM	OK	
+6306-FM	OK	
+6306-FM2	OK	
+6306-FM3	Not OK	abrnomal flow pattern and less flow samples in 1 hour
+4917-FM	OK	
+4917-FM2	Not OK	Not OK	abrnomal flow pattern and less flow samples in 1 hour
+4917-FM3	OK	
+4917-FM4	OK	
+4919-FM	Not OK	Invalid hunting +- 5000
+4919-FM2	OK	
+4919-FM3	Not OK	Invalid hunting
+4919-FM4	OK	Too much noise in data 
+4916-FM	Not OK	Too much noise during non supply hours
+4918-FM	OK	
+4918-FM2	OK	Passing/fluctuating flow in non supply hours
+4921-FM	OK	
+6303-FM	OK	
+6303-FM2	Not OK	Too much fluctuations in non supply hours
+6303-FM3	Not OK	+-763 invalid flow
+6288-FM	OK	
+6295-FM	Not Ok	No data Availiable for 2024-06-15 17:05:41:2024-07-08 17:05:41
+6426-FM	OK	
+6426-FM2	Not OK	sinewave patten, not ok
+6426-FM3	Not OK	Sine wave patten Not ok
+6286-FM	OK	

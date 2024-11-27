@@ -1,0 +1,4 @@
+4517-A	OK	
+4790-A	Not OK	
+4790-B	OK	
+4790-C	Not OK	
