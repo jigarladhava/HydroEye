@@ -53,7 +53,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 /* New code for login Module*/
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(session({ secret: 'auth_model_secret', resave: false, saveUninitialized: true }));
+//app.use(session({ secret: 'auth_model_secret', resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session());
 

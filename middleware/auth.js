@@ -1,6 +1,6 @@
 const session = require('express-session');
 const passport = require('passport');
-const { sessionStore } = require('./models/database'); // Import session store
+const { sessionStore } = require('./../models/database'); // Import session store
 
 module.exports = (app) => {
   app.use(
