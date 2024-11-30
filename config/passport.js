@@ -1,34 +1,41 @@
 const LocalStrategy = require('passport-local').Strategy;
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+const { User } = require('./../models/database'); // Import User model
 
 module.exports = function (passport) {
     passport.use(
-        new LocalStrategy({ usernameField: 'email' }, (email, password, done) => {
-            // Replace with your actual user fetching logic
-            const user = { id: 1, email: 'test@test.com', password: '$2b$10$...' }; // Example user
-            
-            if (!user) {
-                return done(null, false, { message: 'No user found' });
-            }
+        new LocalStrategy(async (username, password, done) => {
+            try {
+                const user = await User.findOne({ where: { username } });
+                if (!user) {
+                    return done(null, false, { message: 'No user found' });
+                }
 
-            bcrypt.compare(password, user.password, (err, isMatch) => {
-                if (err) throw err;
+                const isMatch = await bcrypt.compare(password, user.password);
                 if (isMatch) {
+                   // console.log(user);
                     return done(null, user);
                 } else {
                     return done(null, false, { message: 'Password incorrect' });
                 }
-            });
+            } catch (error) {
+                return done(error);
+            }
         })
     );
 
     passport.serializeUser((user, done) => {
+        console.log('Serializing user:', user); // Debugging
         done(null, user.id);
     });
 
-    passport.deserializeUser((id, done) => {
-        // Replace with your actual user finding logic
-        const user = { id: 1, email: 'test@test.com' }; // Example user
-        done(null, user);
+    passport.deserializeUser(async (id, done) => {
+        try {
+            const user = await User.findByPk(id);
+            console.log('Deserializing user:', user); // Debugging
+            done(null, user);
+        } catch (error) {
+            done(error);
+        }
     });
 };

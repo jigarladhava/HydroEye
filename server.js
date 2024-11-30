@@ -15,7 +15,7 @@ const bcrypt = require('bcrypt');
 const passport = require('passport');/* New code for login Module*/
 require('./config/passport')(passport); /* New code for login Module*/
 const auth = require('./middleware/auth'); /* New code for login Module*/
-const { sequelize,User } = require('./models/database'); /* New code for login Module*/
+const { sequelize, User } = require('./models/database'); /* New code for login Module*/
 
 auth(app);
 
@@ -49,7 +49,6 @@ const ph1swmsdataService = new ph1swmsDataService();
 
 app.use(bodyParser.json());
 app.use(basicAuth('user', 'blank'));
-app.use(express.static(path.join(__dirname, 'public')));
 
 /* New code for login Module*/
 app.use(express.urlencoded({ extended: true }));
@@ -58,11 +57,25 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
-
+/*
 const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) return next();
   res.redirect('/login');
-};
+};*/
+
+app.get('/', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.redirect('/dashboard'); // Redirect to dashboard if authenticated
+  } else {
+    res.redirect('/login'); // Redirect to login if not authenticated
+  }
+});
+
+
+app.use(express.static(path.join(__dirname, 'public')));
+
+
+
 /* New code for login Module*/
 
 
@@ -601,20 +614,46 @@ app.post('/bulkRTU/remove', async (req, res) => {
 
 
 app.get('/login', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'login.html'));
+
+  if (req.user.username !== undefined) {
+    res.redirect('/dashboard');
+  }
+  else {
+    const error = req.query.error || '';
+
+    // Path to the login.html file
+    const loginPagePath = path.join(__dirname, 'public', 'login.html');
+
+    // Read the login.html file
+    fs.readFile(loginPagePath, 'utf8', (err, data) => {
+      if (err) {
+        console.error('Error reading login.html:', err);
+        return res.status(500).send('Server Error');
+      }
+
+      // Inject error message dynamically into the HTML
+      const modifiedData = data.replace(
+        '{{errorMessage}}',
+        error ? `<p style="color: red;">${error}</p>` : ''
+      );
+
+      res.send(modifiedData);
+
+    });
+  }
 });
 
-
+/*
 app.get('/', (req, res) => {
   res.send('Welcome to the Home Page!');
-});
+});*/
 
 
 app.post(
   '/login',
   passport.authenticate('local', {
     successRedirect: '/dashboard',
-    failureRedirect: '/login',
+    failureRedirect: '/login?error=Invalid username or password',
   })
 );
 
@@ -629,14 +668,35 @@ app.post('/signup', async (req, res) => {
     await User.create({ username, password: hashedPassword });
     res.redirect('/login');
   } catch (err) {
-   // console.log(err);
+    // console.log(err);
     res.status(500).send('Error signing up.');
   }
 });
 
-app.get('/dashboard', ensureAuthenticated, (req, res) => {
-  res.send(`Welcome, ${req.user.username}! <a href="/logout">Logout</a>`);
+app.get('/dashboard', (req, res) => {
+  console.log(req.user);
+  console.log('User:', req.user); // Should display the logged-in user
+  console.log('Authenticated:', req.isAuthenticated()); // Should return `true` only for logged-in users
+
+  if (req.user.username !== undefined) {
+    // Send the index.html file
+
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  } else {
+    res.redirect('/login'); // Redirect to login if not authenticated
+  }
 });
+
+
+app.get('/dashboard/user', (req, res) => {
+  if (req.user.username !== undefined) {
+    console.log(req.user);
+    res.json({ username: req.user.username }); // Send the username to the client
+  } else {
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+});
+
 
 app.get('/logout', (req, res) => {
   req.logout((err) => {

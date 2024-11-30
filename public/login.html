@@ -1,17 +1,69 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    /* Center the form and add some padding */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background-color: #f8f9fa; /* Light gray background */
+    }
+
+    .login-container {
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      background-color: #ffffff; /* White background for form */
+    }
+
+    .btn-primary {
+      margin-top: 15px;
+      padding: 10px 20px;
+      border-radius: 5px;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+    }
+  </style>
 </head>
+
 <body>
-  <h2>Login</h2>
-  <form method="post" action="/login">
-    <label>Username:</label>
-    <input type="text" name="username" required><br>
-    <label>Password:</label>
-    <input type="password" name="password" required><br>
-    <button type="submit">Login</button>
-  </form>
-  <p>Don't have an account? <a href="/signup">Sign Up</a></p>
+  <div class="login-container text-center">
+    <h2>Login</h2>
+    <form action="/login" method="POST">
+      <div class="form-group">
+        <label for="username" class="sr-only">Username:</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="Enter Username" required>
+      </div>
+      <div class="form-group">
+        <label for="password" class="sr-only">Password:</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Enter Password" required>
+      </div>
+      <!-- Inject error message here dynamically -->
+      <div id="error-message" class="error-message">{{errorMessage}}</div>
+      <button type="submit" class="btn btn-primary btn-block">Login</button>
+    </form>
+    <p class="mt-3">
+      Don't have an account? <a href="/signup">Sign up</a>
+    </p>
+  </div>
+
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <!-- Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
+
 </html>

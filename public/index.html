@@ -17,10 +17,13 @@
       /* Round the corners */
     }
   </style>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
 </head>
 
 <body>
   <div class="container text-center mt-5"> <!-- Center align and add some top margin -->
+    <h2 id="welcome-message"></h2> <a href="/logout">Logout</a>
+
     <!-- Buttons with links -->
     <a href="/phase1.html" class="btn btn-primary btn-lg btn-block">Phase 1</a>
     <!-- Large primary button with full width -->
@@ -32,8 +35,27 @@
     <!-- Large secondary button with full width -->
 
   </div>
-  <!-- Bootstrap JS (optional, only required if you use Bootstrap JS components) -->
+ 
+
+  <!-- Popper.js -->
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+  <!-- Bootstrap JS -->
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+   <!-- JavaScript to populate the welcome message -->
+   <script>
+    // Fetch username from the server and set the welcome message
+    fetch('/dashboard/user')
+      .then(response => response.json())
+      .then(data => {
+        const welcomeMessage = document.getElementById('welcome-message');
+        welcomeMessage.textContent = `Welcome, ${data.username}!`;
+      })
+      .catch(error => {
+        console.error('Error fetching user data:', error);
+      });
+  </script>
+
 </body>
 
 </html>
