@@ -3,7 +3,7 @@ const session = require('express-session');
 const SequelizeStore = require('connect-session-sequelize')(session.Store);
 
 // Initialize Sequelize instance
-const sequelize = new Sequelize('user_management', 'username', 'password', {
+const sequelize = new Sequelize('hydroeye', 'root', '', {
   host: 'localhost',
   dialect: 'mysql',
   logging: true, // Disable SQL logging in console (optional)
