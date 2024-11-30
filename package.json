@@ -12,6 +12,7 @@
     "axios": "^1.6.8",
     "basic-auth": "^2.0.1",
     "basic-auth-connect": "^1.0.0",
+    "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
     "connect-session-sequelize": "^7.1.7",

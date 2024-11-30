@@ -9,12 +9,13 @@ const https = require('https');
 const axios = require('axios');
 const bodyParser = require('body-parser');
 fs = require('fs');
+const bcrypt = require('bcrypt');
 
 
 const passport = require('passport');/* New code for login Module*/
 require('./config/passport')(passport); /* New code for login Module*/
 const auth = require('./middleware/auth'); /* New code for login Module*/
-const { sequelize } = require('./models/database'); /* New code for login Module*/
+const { sequelize,User } = require('./models/database'); /* New code for login Module*/
 
 auth(app);
 
@@ -628,6 +629,7 @@ app.post('/signup', async (req, res) => {
     await User.create({ username, password: hashedPassword });
     res.redirect('/login');
   } catch (err) {
+   // console.log(err);
     res.status(500).send('Error signing up.');
   }
 });
@@ -651,7 +653,7 @@ app.listen(port, () => {
   try {
     sequelize.authenticate(); // Verify DB connection on startup
     console.log('Database connection verified.');
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server running on http://localhost:${port}`);
   } catch (error) {
     console.error('Database connection failed:', error);
   }
