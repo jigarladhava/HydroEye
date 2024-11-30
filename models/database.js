@@ -6,7 +6,7 @@ const SequelizeStore = require('connect-session-sequelize')(session.Store);
 const sequelize = new Sequelize('hydroeye', 'root', '', {
   host: 'localhost',
   dialect: 'mysql',
-  logging: true, // Disable SQL logging in console (optional)
+  logging: false, // Disable SQL logging in console (optional)
 });
 
 // Define User Model

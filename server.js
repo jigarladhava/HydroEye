@@ -48,7 +48,7 @@ const ph1dataservice = new ph1DataService(ph1baseUrl);
 const ph1swmsdataService = new ph1swmsDataService();
 
 app.use(bodyParser.json());
-app.use(basicAuth('user', 'blank'));
+//app.use(basicAuth('user', 'blank'));
 
 /* New code for login Module*/
 app.use(express.urlencoded({ extended: true }));
@@ -63,11 +63,31 @@ const ensureAuthenticated = (req, res, next) => {
   res.redirect('/login');
 };*/
 
+
+app.use((req, res, next) => {
+  const unprotectedRoutes = ['/login', '/signup', '/logout']; // Add routes that don't require authentication
+  if (unprotectedRoutes.includes(req.path)) {
+    return next(); // Skip authentication check for these routes
+  }
+  ensureAuthenticated(req, res, next); // Apply authentication middleware to other routes
+});
+
+// Authentication middleware
+function ensureAuthenticated(req, res, next) {
+  if (req.user!==undefined && req.user.username!== undefined) {
+    return next(); // Allow access if authenticated
+  }
+  res.redirect('/login'); // Redirect to login if not authenticated
+}
+
+
+
+
 app.get('/', (req, res) => {
-  if (req.isAuthenticated()) {
-    res.redirect('/dashboard'); // Redirect to dashboard if authenticated
-  } else {
+  if (req.user===undefined || req.user.username === undefined) {
     res.redirect('/login'); // Redirect to login if not authenticated
+  } else {
+    res.redirect('/dashboard'); // Redirect to dashboard if authenticated
   }
 });
 
@@ -615,7 +635,7 @@ app.post('/bulkRTU/remove', async (req, res) => {
 
 app.get('/login', (req, res) => {
 
-  if (req.user.username !== undefined) {
+  if (req.user !== undefined && req.user.username !== undefined) {
     res.redirect('/dashboard');
   }
   else {
@@ -674,9 +694,9 @@ app.post('/signup', async (req, res) => {
 });
 
 app.get('/dashboard', (req, res) => {
-  console.log(req.user);
-  console.log('User:', req.user); // Should display the logged-in user
-  console.log('Authenticated:', req.isAuthenticated()); // Should return `true` only for logged-in users
+ // console.log(req.user);
+  //console.log('User:', req.user); // Should display the logged-in user
+  //console.log('Authenticated:', req.isAuthenticated()); // Should return `true` only for logged-in users
 
   if (req.user.username !== undefined) {
     // Send the index.html file
@@ -690,7 +710,7 @@ app.get('/dashboard', (req, res) => {
 
 app.get('/dashboard/user', (req, res) => {
   if (req.user.username !== undefined) {
-    console.log(req.user);
+   // console.log(req.user);
     res.json({ username: req.user.username }); // Send the username to the client
   } else {
     res.status(401).json({ error: 'Unauthorized' });
