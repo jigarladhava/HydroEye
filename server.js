@@ -730,7 +730,7 @@ app.get('/login', (req, res) => {
       // Inject error message dynamically into the HTML
       const modifiedData = data.replace(
         '{{errorMessage}}',
-        error ? `<p style="color: red;">${error}</p>` : ''
+        error ? `<p style="color: red;">${escapeHTML(error)}</p>` : ''
       );
 
       res.send(modifiedData);
@@ -738,6 +738,16 @@ app.get('/login', (req, res) => {
     });
   }
 });
+
+const escapeHTML = (str) => {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+};
+
 
 /*
 app.get('/', (req, res) => {
@@ -749,7 +759,7 @@ app.post(
   '/login',
   passport.authenticate('local', {
     successRedirect: '/dashboard',
-    failureRedirect: '/login?error=Invalid username or password',
+    failureRedirect: '/login?error=Invalid username or password or account not activated',
   })
 );
 
