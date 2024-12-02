@@ -10,6 +10,8 @@ const axios = require('axios');
 const bodyParser = require('body-parser');
 fs = require('fs');
 const bcrypt = require('bcrypt');
+const exphbs = require('express-handlebars');
+
 
 
 const passport = require('passport');/* New code for login Module*/
@@ -57,6 +59,10 @@ app.use(express.json());
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.engine('hbs', exphbs.engine({ extname: '.hbs' }));
+app.set('view engine', 'hbs');
+app.set('views', path.join(__dirname, 'views'));
+
 /*
 const ensureAuthenticated = (req, res, next) => {
   if (req.isAuthenticated()) return next();
@@ -74,17 +80,28 @@ app.use((req, res, next) => {
 
 // Authentication middleware
 function ensureAuthenticated(req, res, next) {
-  if (req.user!==undefined && req.user.username!== undefined) {
+  if (req.user !== undefined && req.user.username !== undefined) {
     return next(); // Allow access if authenticated
   }
   res.redirect('/login'); // Redirect to login if not authenticated
 }
 
+app.get('/admin/*', ensureAdmin);
+
+function ensureAdmin(req, res, next) {
+  console.log(req.user.isAdmin);
+  if (req.isAuthenticated() && req.user.username !== undefined && req.user.isAdmin) {
+    return next();
+  }
+  res.status(403).send('Access Denied: Admins only');
+}
+
+
 
 
 
 app.get('/', (req, res) => {
-  if (req.user===undefined || req.user.username === undefined) {
+  if (req.user === undefined || req.user.username === undefined) {
     res.redirect('/login'); // Redirect to login if not authenticated
   } else {
     res.redirect('/dashboard'); // Redirect to dashboard if authenticated
@@ -94,9 +111,68 @@ app.get('/', (req, res) => {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.get('/admin', ensureAdmin, async (req, res) => {
+  try {
+    const users = await User.findAll({ attributes: ['id', 'username', 'isAdmin'] });
+   //console.log(users);
+    const plainUsers = users.map(user => user.get({ plain: true })); // Convert to plain objects
+    res.render('admin', { users: plainUsers });
+
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    res.status(500).send('Server Error');
+  }
+});
 
 
-/* New code for login Module*/
+
+
+app.post('/admin/add-user', ensureAdmin, async (req, res) => {
+  const { username, password, isAdmin } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await User.create({ username, password: hashedPassword, isAdmin });
+    res.redirect('/admin');
+  } catch (error) {
+    res.status(500).send('Error adding user');
+  }
+});
+
+app.post('/admin/change-password', ensureAdmin, async (req, res) => {
+  const { userId, newPassword } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.update({ password: hashedPassword }, { where: { id: userId } });
+    res.redirect('/admin');
+  } catch (error) {
+    res.status(500).send('Error updating password');
+  }
+});
+
+app.post('/admin/change-password', ensureAdmin, async (req, res) => {
+  const { userId, newPassword } = req.body;
+  try {
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    await User.update({ password: hashedPassword }, { where: { id: userId } });
+    res.redirect('/admin');
+  } catch (error) {
+    res.status(500).send('Error updating password');
+  }
+});
+
+app.post('/admin/delete-user', ensureAdmin, async (req, res) => {
+  const { userId } = req.body;
+  try {
+    await User.destroy({ where: { id: userId } });
+    res.redirect('/admin');
+  } catch (error) {
+    res.status(500).send('Error deleting user');
+  }
+});
+
+
+
+
 
 
 
@@ -694,7 +770,7 @@ app.post('/signup', async (req, res) => {
 });
 
 app.get('/dashboard', (req, res) => {
- // console.log(req.user);
+  // console.log(req.user);
   //console.log('User:', req.user); // Should display the logged-in user
   //console.log('Authenticated:', req.isAuthenticated()); // Should return `true` only for logged-in users
 
@@ -710,7 +786,7 @@ app.get('/dashboard', (req, res) => {
 
 app.get('/dashboard/user', (req, res) => {
   if (req.user.username !== undefined) {
-   // console.log(req.user);
+    // console.log(req.user);
     res.json({ username: req.user.username }); // Send the username to the client
   } else {
     res.status(401).json({ error: 'Unauthorized' });

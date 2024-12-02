@@ -31,8 +31,10 @@ module.exports = function (passport) {
 
     passport.deserializeUser(async (id, done) => {
         try {
-            const user = await User.findByPk(id);
-        //    console.log('Deserializing user:', user); // Debugging
+            const user = await User.findByPk(id, {
+            //    attributes: ['id', 'username','createdAt', 'updatedAt', 'isAdmin'], // Include specific columns if needed
+            });
+         //  console.log('Deserializing user:', user); // Debugging
             done(null, user);
         } catch (error) {
             done(error);
