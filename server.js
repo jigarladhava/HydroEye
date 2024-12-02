@@ -89,7 +89,7 @@ function ensureAuthenticated(req, res, next) {
 app.get('/admin/*', ensureAdmin);
 
 function ensureAdmin(req, res, next) {
-  console.log(req.user.isAdmin);
+ // console.log(req.user.isAdmin);
   if (req.isAuthenticated() && req.user.username !== undefined && req.user.isAdmin) {
     return next();
   }
