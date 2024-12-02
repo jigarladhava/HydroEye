@@ -1,68 +1,218 @@
-  <div class="admin-container text-center">
-    <h1>Admin - User Management</h1>
+<style>
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+  }
 
-    <!-- Add User Form -->
-    <h2>Add New User</h2>
-    <form action="/admin/add-user" method="POST" class="text-left">
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" name="username" class="form-control" placeholder="Enter Username" required>
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" name="password" class="form-control" placeholder="Enter Password" required>
-      </div>
-      <div class="form-group">
-        <label for="isAdmin">Admin Privileges:</label>
-        <select id="isAdmin" name="isAdmin" class="form-control">
-          <option value="false">No</option>
-          <option value="true">Yes</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-primary btn-block">Add User</button>
-    </form>
+  .switch input {
+    display: none;
+  }
 
-    <!-- User List -->
-    <h2 class="mt-5">User List</h2>
-    <table class="table table-bordered">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Username</th>
-          <th>Admin</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      
-      <tbody>
-        {{#each users}}
-        <tr>
-          <td>{{this.id}}</td>
-          <td>{{this.username}}</td>
-          <td>{{this.isAdmin}}</td>
-          <td>
-            <form action="/admin/change-password" method="POST" class="d-inline">
-              <input type="hidden" name="userId" value="{{this.id}}">
-              <input type="password" name="newPassword" class="form-control" placeholder="New Password" required>
-              <button type="submit" class="btn btn-warning">Change Password</button>
-            </form>
-            <form action="/admin/delete-user" method="POST" class="d-inline">
-              <input type="hidden" name="userId" value="{{this.id}}">
-              <button type="submit" class="btn btn-danger">Delete</button>
-            </form>
-          </td>
-        </tr>
-        {{/each}}
-      </tbody>
-      
-    
-    
-    </table>
-  </div>
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 20px;
+  }
 
-  <!-- jQuery -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <!-- Popper.js -->
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
-  <!-- Bootstrap JS -->
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 14px;
+    width: 14px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  input:checked+.slider {
+    background-color: #4caf50;
+  }
+
+  input:checked+.slider:before {
+    transform: translateX(20px);
+  }
+
+  .notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    min-width: 250px;
+    padding: 15px;
+    border-radius: 5px;
+    color: white;
+    font-weight: bold;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 1000;
+    animation: fadeInOut 3s ease-in-out;
+  }
+
+  .notification.success {
+    background-color: #4caf50;
+  }
+
+  .notification.error {
+    background-color: #f44336;
+  }
+
+  @keyframes fadeInOut {
+    0% { opacity: 0; transform: translateY(-20px); }
+    10%, 90% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0; transform: translateY(-20px); }
+  }
+</style>
+
+
+<div id="notification" class="notification"></div>
+
+
+<div class="admin-container text-center">
+  <h1>Admin - User Management</h1>
+
+  <!-- Add User Form -->
+  <h2>Add New User</h2>
+  <form action="/admin/add-user" method="POST" class="text-left">
+    <div class="form-group">
+      <label for="username">Username:</label>
+      <input type="text" id="username" name="username" class="form-control" placeholder="Enter Username" required>
+    </div>
+    <div class="form-group">
+      <label for="password">Password:</label>
+      <input type="password" id="password" name="password" class="form-control" placeholder="Enter Password" required>
+    </div>
+    <div class="form-group">
+      <label for="isAdmin">Admin Privileges:</label>
+      <select id="isAdmin" name="isAdmin" class="form-control">
+        <option value="false">No</option>
+        <option value="true">Yes</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="isActive">Active User:</label>
+      <select id="isActive" name="isActive" class="form-control">
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+    <button type="submit" class="btn btn-primary btn-block">Add User</button>
+  </form>
+
+  <!-- User List -->
+  <h2 class="mt-5">User List</h2>
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Username</th>
+        <th>Admin</th>
+        <th>Active</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      {{#each users}}
+      <tr>
+        <td>{{this.id}}</td>
+        <td>{{this.username}}</td>
+        <td>
+          <label class="switch">
+            <input type="checkbox" class="toggle-admin" data-id="{{id}}" {{#if this.isAdmin}}checked{{/if}}>
+            <span class="slider"></span>
+          </label>
+        </td>
+        <td>
+          <label class="switch">
+            <input type="checkbox" class="toggle-active" data-id="{{id}}" {{#if this.isActive}}checked{{/if}}>
+            <span class="slider"></span>
+          </label>
+        </td>
+        <!--  <td>{{this.isAdmin}}</td>-->
+        <td>
+          <form action="/admin/change-password" method="POST" class="d-inline">
+            <input type="hidden" name="userId" value="{{this.id}}">
+            <input type="password" name="newPassword" class="form-control" placeholder="New Password" required>
+            <button type="submit" class="btn btn-warning">Change Password</button>
+          </form>
+          <form action="/admin/delete-user" method="POST" class="d-inline">
+            <input type="hidden" name="userId" value="{{this.id}}">
+            <button type="submit" class="btn btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+
+
+
+  </table>
+</div>
+
+<script>
+  function showNotification(message, type) {
+  const notification = document.getElementById('notification');
+  notification.textContent = message;
+  notification.className = `notification ${type}`;
+  notification.style.display = 'block';
+
+  // Automatically hide after 3 seconds
+  setTimeout(() => {
+    notification.style.display = 'none';
+  }, 3000);
+}
+
+
+  document.querySelectorAll('.toggle-admin').forEach(switchElement => {
+    switchElement.addEventListener('change', function () {
+      const userId = this.dataset.id;
+      const isAdmin = this.checked;
+      updateFlag(userId, { isAdmin });
+    });
+  });
+
+  document.querySelectorAll('.toggle-active').forEach(switchElement => {
+    switchElement.addEventListener('change', function () {
+      const userId = this.dataset.id;
+      const isActive = this.checked;
+      updateFlag(userId, { isActive });
+    });
+  });
+
+async function updateFlag(userId, data) {
+  try {
+    const response = await fetch('/api/update-user-flags', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, ...data }),
+    });
+
+    const result = await response.json();
+
+    if (!result.success) {
+      showNotification(`Error: ${result.message}`, 'error'); // Red notification
+    } else {
+      showNotification(`Success: ${result.message}`, 'success'); // Green notification
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    showNotification('An error occurred while updating user flags.', 'error'); // Red notification
+  }
+}
+
+</script>
+
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<!-- Popper.js -->
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.7/dist/umd/popper.min.js"></script>
+<!-- Bootstrap JS -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>

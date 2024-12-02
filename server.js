@@ -118,7 +118,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/admin', ensureAdmin, async (req, res) => {
   try {
-    const users = await User.findAll({ attributes: ['id', 'username', 'isAdmin'] });
+    const users = await User.findAll({ attributes: ['id', 'username', 'isAdmin','isActive'] });
     //console.log(users);
     const plainUsers = users.map(user => user.get({ plain: true })); // Convert to plain objects
     res.render('admin', { users: plainUsers });
@@ -129,6 +129,30 @@ app.get('/admin', ensureAdmin, async (req, res) => {
   }
 });
 
+app.post('/api/update-user-flags', ensureAdmin, async (req, res) => {
+  const { userId, isAdmin, isActive } = req.body;
+
+  try {
+    // Find the user by ID
+    const user = await User.findByPk(userId); // Replace with your ORM or database logic
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Update the flags
+    if (isAdmin !== undefined) user.isAdmin = isAdmin;
+    if (isActive !== undefined) user.isActive = isActive;
+
+    // Save the changes
+    await user.save();
+
+    // Respond with success
+    res.json({ success: true, message: 'User flags updated successfully', user });
+  } catch (error) {
+    console.error('Error updating user flags:', error);
+    res.status(500).json({ success: false, message: 'Error updating user flags' });
+  }
+});
 
 
 
