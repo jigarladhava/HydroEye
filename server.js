@@ -81,7 +81,12 @@ app.use((req, res, next) => {
 // Authentication middleware
 function ensureAuthenticated(req, res, next) {
   if (req.user !== undefined && req.user.username !== undefined) {
-    return next(); // Allow access if authenticated
+    if (req.user.isActive) {
+      // console.log( 'isActive' , req.user.isActive);
+      return next(); // Allow access if authenticated
+    } else res.redirect('/login?error=Account not activated');
+    return;
+
   }
   res.redirect('/login'); // Redirect to login if not authenticated
 }
@@ -89,7 +94,7 @@ function ensureAuthenticated(req, res, next) {
 app.get('/admin/*', ensureAdmin);
 
 function ensureAdmin(req, res, next) {
- // console.log(req.user.isAdmin);
+  // console.log(req.user.isAdmin);
   if (req.isAuthenticated() && req.user.username !== undefined && req.user.isAdmin) {
     return next();
   }
@@ -114,7 +119,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/admin', ensureAdmin, async (req, res) => {
   try {
     const users = await User.findAll({ attributes: ['id', 'username', 'isAdmin'] });
-   //console.log(users);
+    //console.log(users);
     const plainUsers = users.map(user => user.get({ plain: true })); // Convert to plain objects
     res.render('admin', { users: plainUsers });
 
@@ -171,33 +176,22 @@ app.post('/admin/delete-user', ensureAdmin, async (req, res) => {
 });
 
 
-
-
-
-
-
 app.get('/data', async (req, res) => {
   const { dlp, flowmeter, startTime, endTime } = req.query;
+  const isAdmin = req.user.isAdmin;
+    try {
 
-  try {
-
-    const historicalData = await dataService.fetchHistoicData(dlp, flowmeter, startTime, endTime);
+    const historicalData = await dataService.fetchHistoicData(dlp, flowmeter, startTime, endTime,isAdmin);
 
     if (historicalData.length == 0) {
       res.status(500).json({ error: 'No data found for search' });
       return;
     }
-    // 
 
 
-    //  let latestRecords = {};
-
-    //  console.log(historicalData);
-    // Iterate through the data
 
 
     for (let i = 0; i < historicalData.length; i++) {
-      //  console.log(historicalData[i]);
       historicalData[i].timestamp = DateTime.fromFormat(historicalData[i].timestamp.replace(/\.\d+$/g, ''), 'dd/MM/yyyy HH:mm:ss').toFormat('yyyy-MM-dd  HH:mm:ss');
     }
 
@@ -205,25 +199,20 @@ app.get('/data', async (req, res) => {
 
 
 
-    //  console.log(historicalData);
-
     const lastDayTotals = {};
 
     const yesterday = new Date();
     yesterday.setDate(yesterday.getDate() - 1);
     const yesterdayTimestamp = yesterday.toISOString().split('T')[0]; // Get the date part
 
-    // Filter the data for the specified AI type and yesterday's date
 
     for (let i = 1; i <= 3; i++) {
       const filteredData = historicalData.filter(record => {
         return record.tagName.includes('I' + i) && record.timestamp.includes(yesterdayTimestamp);
       });
 
-      // Sort the filtered data by timestamp in descending order
       filteredData.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-      // Get the last reading value if there's any data for yesterday
       const lastReading = filteredData.length > 0 ? filteredData[0].value : 'No data for yesterday';
 
       switch (i) {
@@ -306,8 +295,8 @@ app.get('/data/rtu', async (req, res) => {
   const { rtuNo, flowmeter, startTime, endTime } = req.query;
 
   try {
-
-    const historicalData = await dataService.fetchHistoicRTUData(rtuNo, flowmeter, startTime, endTime);
+    const isAdmin = req.user.isAdmin;
+    const historicalData = await dataService.fetchHistoicRTUData(rtuNo, flowmeter, startTime, endTime,isAdmin);
     //  let latestRecords = {};
     if (historicalData.length == 0) {
       res.status(500).json({ error: 'No data found for search' });
@@ -434,8 +423,8 @@ app.get('/ph2/getFMs', async (req, res) => {
   const { rtuNo } = req.query;
 
   try {
-
-    const fmDetails = await dataService.fetchFMs(rtuNo);
+    const isAdmin = req.user.isAdmin;
+    const fmDetails = await dataService.fetchFMs(rtuNo,isAdmin);
     res.json(fmDetails);
   } catch (error) {
     console.error('Error fetching data:', error);

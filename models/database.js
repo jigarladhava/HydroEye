@@ -23,6 +23,10 @@ const User = sequelize.define('User', {
   isAdmin: {
     type: DataTypes.BOOLEAN, // Define isAdmin as a boolean
     defaultValue: false, // Default value is false
+  },
+  isActive: {
+    type: DataTypes.BOOLEAN, // Define isAdmin as a boolean
+    defaultValue: false, // Default value is false
   }
 });
 

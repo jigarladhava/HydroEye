@@ -2,6 +2,8 @@
 const axios = require('axios');
 const https = require('https');
 const { DateTime } = require("luxon");
+const fs = require('fs');
+const path = require('path');
 
 class DataService {
     constructor(apiBaseUrl) {
@@ -10,18 +12,40 @@ class DataService {
             httpsAgent: new https.Agent({
                 rejectUnauthorized: false
             })
-           /* , proxy: {
-                host: '127.0.0.1',
-                port: 8888,
-            }*/
+            /* , proxy: {
+                 host: '127.0.0.1',
+                 port: 8888,
+             }*/
         });
 
     }
 
+    async validatedlpRTU(dlpRTUNo,isAdmin) {
+        if(isAdmin){
+            return true;
+        }
+        const filePath = path.join(__dirname, 'ph1_preload', 'dlprtu.txt');
+        console.log(`Reading from file: ${filePath}`);
+        
+        try {
+            const data = await fs.promises.readFile(filePath, 'utf8');
+            const lines = data.split(/\r?\n/); // Split file content into lines
+            const isValid = lines.includes(dlpRTUNo);
+         //   console.log(`Validation result for ${dlpRTUNo}: ${isValid}`);
+            return isValid;
+        } catch (err) {
+            console.error('Error reading file:', err);
+            return false; // Return false if the file cannot be read
+        }
+    }
 
-    async fetchHistoicData(dlpNo, fmID, startTime, endTime) {
 
-
+    async fetchHistoicData(dlpNo, fmID, startTime, endTime,isAdmin) {
+    
+        if (!(await this.validatedlpRTU(dlpNo,isAdmin))) {
+            console.error('Error retriving data:', 'err');
+            throw new Error('Error retriving data');
+        }
 
         console.log(startTime);
         console.log(endTime);
@@ -70,10 +94,12 @@ class DataService {
 
     }
 
-    async fetchHistoicRTUData(rtuNo, fmID, startTime, endTime) {
+    async fetchHistoicRTUData(rtuNo, fmID, startTime, endTime,isAdmin) {
 
-
-
+        if (!(await this.validatedlpRTU(dlpNo,isAdmin))) {
+            console.error('Error retriving data:', 'err');
+            throw new Error('Error retriving data');
+        }
         console.log(startTime);
         console.log(endTime);
         if (startTime == undefined || endTime == undefined || startTime == null || endTime == null || startTime.length < 1 || endTime.length < 1) {
@@ -110,7 +136,7 @@ class DataService {
         console.log(`${this.apiBaseUrl}/query`);
         try {
             const response = await this.axiosinstance.post(`${this.apiBaseUrl}/query`, QueryJson, options);
-            
+
             return response.data.result;
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -121,7 +147,11 @@ class DataService {
 
     }
 
-    async fetchFMs(rtuNo) {
+    async fetchFMs(rtuNo,isAdmin) {
+        if (!(await this.validatedlpRTU(dlpNo,isAdmin))) {
+            console.error('Error retriving data:', 'err');
+            throw new Error('Error retriving data');
+        }
 
 
         var SQLQuery = `SELECT FullName FROM CDBObject O  WHERE (O.FullName LIKE 'RTUs%${rtuNo}%Flow' OR O.FullName LIKE 'RTUs%${rtuNo}%Totalizer') AND TypeName = 'CDNP3AnalogIn'`;
@@ -154,5 +184,7 @@ class DataService {
     }
 
 }
+
+
 
 module.exports = DataService;
