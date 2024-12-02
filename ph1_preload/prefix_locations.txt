@@ -1,0 +1,79 @@
+Airport Booster|AIB
+Ajwa OHT|AJW
+Akota OHT|AKT
+Airport Circle and Bright Jn|ANG
+Bakrawadi Booster|BKW
+Bapu ni Dargah|BND
+Bank of Baroda Jn|BOB
+Bapod OHT|BPD
+Chhani Janakatnaka OHT|CHJ
+Chhani Village OHT|CHV
+Dodka RCW|DOD
+Dashama Mandir Booster|DSM
+Danteshwar Booster|DTR
+Dodka WTP|DWT
+Fajalpur Frenchwell|FAJ
+Fatehpura Booster|FTP
+GIDC Booster|GBT
+Geri Jn|GER
+Gajrawadi OHT|GJW
+Gorwa OHT|GOA
+GIDC OHT|GOT
+Gayatrinagar OHT|GYT
+Harinagar OHT|HRI
+Jail OHT|JAI
+Jambuva OHT|JAM
+Junigadhi Booster|JGD
+Kalali Jn|KAL
+Khanpur WTP|KHW
+Kalali OHT|KLI
+Kapurai OHT|KPR
+Geri (Kalpataru)Jn|KPT
+Karelibaug OHT|KRL
+Lalbaug OHT|LBB
+Lalbaug Jn|LBH
+Makarpura Airforce Booster|MAF
+Maheshnagar Booster|MAH
+MBR Reserviour|MBR
+Manjalpur OHT|MJP
+Makarpura Booster|MKP
+Mahanagar Booster|MNG
+Mahavir Hall Jn|MVR
+Navi Dharti Booster|NDH
+Nanddham Booster|NDM
+North Harni OHT|NHO
+Nalanda OHT|NLD
+Nimeta 1 WTP|NM1
+Nimeta 2 WTP|NM2
+Nimeta 3 WTP|NM3
+Nimeta Interconnection|NMT
+Navlakhi Booster|NVL
+Parshurambhatta Booster|PAR
+Panigate OHT|PGT
+Poicha RCW|POI
+Polytechnic Jn|POLY
+Raika RCW|RAI
+Dumand Jn|SAJ
+Sama OHT|SAM
+Subhanpura OHT|SBP
+Sadhnanagar Booster|SDN
+Sardar Estate Jn|SDR
+Sherkhi Intakewell|SHR
+Sindhrot WTP|SIN
+Sayajipura OHT|SJP
+Sankheda Dashalad Booster|SKD
+Susen Jn|SSN
+Soma Talav Jn|STJ
+Soma Talav Booster|STL
+Sayajibaug OHT|SYB
+Satyam Hospital Jn|SYM
+Sayajipura Jn|SYP
+Tarsali OHT|TAR
+Tandalja OHT|TDJ
+TP-13 OHT|TPO
+Vadiwadi OHT|VAD
+Vasna OHT|VSN
+Warasiya Booster|WAR
+Ward 11 Jn|WRD
+BHP|BHP
+BRW|BRW
